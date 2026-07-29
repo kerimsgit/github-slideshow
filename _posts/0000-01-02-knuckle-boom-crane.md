@@ -84,3 +84,5 @@ console.log('Yük eğrisine uygun mu?', isWithinChart(loadTon, outreachM));
 - Emniyet PLC logic'i: limit switch + moment limiter + soft stop.
 
 Uygulama sayfası: [Katlanır Bomlu Vinç Hesaplayıcı](../crane-app.html)
+
+Doğrudan açmak için: `http://localhost:4000/crane-app.html`
