@@ -82,3 +82,5 @@ console.log('Yük eğrisine uygun mu?', isWithinChart(loadTon, outreachM));
 - Silindir boyu → eklem açısı için **ters kinematik**.
 - Yapısal doğrulama için bom kesitlerinde **gerilme / burkulma** kontrolü.
 - Emniyet PLC logic'i: limit switch + moment limiter + soft stop.
+
+Uygulama sayfası: [Katlanır Bomlu Vinç Hesaplayıcı](../crane-app.html)
