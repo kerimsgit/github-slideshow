@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Katlanır Bomlu Vinç Uygulaması</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; background:#0f172a; color:#e2e8f0; }
+    .container { max-width: 900px; margin: 0 auto; }
+    .card { background:#1e293b; border-radius:12px; padding:18px; margin-bottom:16px; }
+    label { display:block; margin:8px 0 4px; }
+    input { width:100%; padding:8px; border-radius:8px; border:1px solid #334155; background:#0b1220; color:#e2e8f0; }
+    button { margin-top:12px; padding:10px 14px; border:none; border-radius:8px; background:#22c55e; color:#03200d; font-weight:700; cursor:pointer; }
+    .row { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
+    .result { font-size: 1.05rem; line-height:1.6; }
+    .ok { color:#86efac; }
+    .bad { color:#fca5a5; }
+    code { color:#93c5fd; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Katlanır Bomlu Vinç Uygulama Sayfası</h1>
+    <p>Bu araç; bom uç konumu, erişim ve örnek yük eğrisi uygunluğunu hızlıca hesaplar.</p>
+
+    <div class="card">
+      <h2>Girdiler</h2>
+      <div class="row">
+        <div><label>Segment 1 (m)</label><input id="s1" type="number" step="0.1" value="3.6"></div>
+        <div><label>Segment 2 (m)</label><input id="s2" type="number" step="0.1" value="2.8"></div>
+        <div><label>Segment 3 (m)</label><input id="s3" type="number" step="0.1" value="1.9"></div>
+      </div>
+      <div class="row">
+        <div><label>Açı 1 (°)</label><input id="a1" type="number" step="1" value="42"></div>
+        <div><label>Açı 2 (°)</label><input id="a2" type="number" step="1" value="-38"></div>
+        <div><label>Açı 3 (°)</label><input id="a3" type="number" step="1" value="12"></div>
+      </div>
+      <div class="row">
+        <div><label>Taban yüksekliği (m)</label><input id="baseHeight" type="number" step="0.1" value="1.2"></div>
+        <div><label>Yük (ton)</label><input id="loadTon" type="number" step="0.1" value="2.2"></div>
+        <div><label>Dinamik katsayı</label><input id="dyn" type="number" step="0.05" value="1.25"></div>
+      </div>
+      <button id="calcBtn">Hesapla</button>
+    </div>
+
+    <div class="card result" id="output"></div>
+
+
+    <div class="card">
+      <h2>Daha neler yapabiliriz?</h2>
+      <ul>
+        <li><strong>Canlı bom çizimi:</strong> Segmentleri SVG/canvas üzerinde ölçekli gösterme.</li>
+        <li><strong>Ters kinematik:</strong> Hedef x/y noktasına ulaşmak için önerilen eklem açılarını hesaplama.</li>
+        <li><strong>Silindir seçimi:</strong> Silindir stroku, kuvveti ve bağlantı noktalarını boyutlandırma.</li>
+        <li><strong>Yük diyagramı:</strong> Erişim-yük grafiğini kullanıcı verileriyle düzenlenebilir hale getirme.</li>
+        <li><strong>Emniyet uyarıları:</strong> Açı limiti, aşırı moment ve negatif yükseklik için görsel alarm üretme.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const limits = [
+      { min: -10, max: 75 },
+      { min: -95, max: 20 },
+      { min: -60, max: 60 }
+    ];
+
+    const chart = [
+      { reach: 3, maxLoad: 3.2 },
+      { reach: 4, maxLoad: 2.5 },
+      { reach: 6, maxLoad: 1.6 },
+      { reach: 8, maxLoad: 1.0 }
+    ];
+
+    const degToRad = d => d * Math.PI / 180;
+
+    function clampToLimits(angles) {
+      return angles.map((a, i) => Math.max(limits[i].min, Math.min(limits[i].max, a)));
+    }
+
+    function forwardKinematics2D(baseY, lengths, anglesDeg) {
+      let x = 0;
+      let y = baseY;
+      let theta = 0;
+      for (let i = 0; i < lengths.length; i++) {
+        theta += degToRad(anglesDeg[i]);
+        x += lengths[i] * Math.cos(theta);
+        y += lengths[i] * Math.sin(theta);
+      }
+      return { x, y };
+    }
+
+    function maxLoadAt(outreach) {
+      const point = chart.find(p => outreach <= p.reach) || chart[chart.length - 1];
+      return point.maxLoad;
+    }
+
+    function requiredMoment(loadTon, outreach, dyn) {
+      return loadTon * outreach * dyn;
+    }
+
+    function calculate() {
+      const lengths = [s1.value, s2.value, s3.value].map(Number);
+      const angles = [a1.value, a2.value, a3.value].map(Number);
+      const safeAngles = clampToLimits(angles);
+      const tip = forwardKinematics2D(Number(baseHeight.value), lengths, safeAngles);
+      const outreach = Math.abs(tip.x);
+      const load = Number(loadTon.value);
+      const dynFactor = Number(dyn.value);
+      const allowed = maxLoadAt(outreach);
+      const ok = load <= allowed;
+      const reqMoment = requiredMoment(load, outreach, dynFactor);
+
+      output.innerHTML = `
+        <p><strong>Bom ucu:</strong> x=${tip.x.toFixed(2)} m, y=${tip.y.toFixed(2)} m</p>
+        <p><strong>Erişim:</strong> ${outreach.toFixed(2)} m</p>
+        <p><strong>Sınırlandırılmış açılar:</strong> <code>[${safeAngles.join(', ')}]</code></p>
+        <p><strong>Yük eğrisi limiti:</strong> ${allowed.toFixed(2)} ton</p>
+        <p><strong>Gerekli denge momenti (yaklaşık):</strong> ${reqMoment.toFixed(2)} ton·m</p>
+        <p class="${ok ? 'ok' : 'bad'}"><strong>Durum:</strong> ${ok ? 'UYGUN ✅' : 'UYGUN DEĞİL ❌'}</p>
+      `;
+    }
+
+    calcBtn.addEventListener('click', calculate);
+    calculate();
+  </script>
+</body>
+</html>
