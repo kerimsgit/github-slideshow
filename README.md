@@ -11,3 +11,28 @@ I'm the GitHub Learning Lab bot and I'm here to help guide you in your journey t
 I'll meet you over there, can't wait to get started!
 
 This course is using the :sparkles: open source project [reveal.js](https://github.com/hakimel/reveal.js/). In some cases we’ve made changes to the history so it would behave during class, so head to the original project repo to learn more about the cool people behind this project.
+
+## Katlanır Bomlu Vinç Uygulamasını Açma
+
+- Doğrudan sayfa: `./crane-app.html`
+- Tarayıcı linki (yerelde): `http://localhost:4000/crane-app.html`
+- GitHub Pages linki (repo yayınındaysa): `https://<kullanici-adi>.github.io/github-slideshow/crane-app.html`
+
+- Tek tıkla açılabilir dosya: `./knuckle-boom-crane-app.html` (dosyayı çift tıklayarak tarayıcıda açabilirsiniz)
+
+
+## Geliştirme fikirleri
+
+- Canlı SVG/canvas vinç çizimi eklenebilir.
+- Hedef koordinattan açı hesaplayan ters kinematik modülü eklenebilir.
+- Silindir stroku/kuvveti ve yük diyagramı hesapları detaylandırılabilir.
+- Limit aşımlarında görsel emniyet uyarıları gösterilebilir.
+
+
+## Neler yaptık?
+
+- Katlanır bomlu vinç için etkileşimli hesaplayıcı sayfaları oluşturduk.
+- Bom segmentleri, eklem açıları, yük ve dinamik katsayı girdilerini hesaplamaya bağladık.
+- 2D ileri kinematik, açı limit kontrolü, örnek yük eğrisi ve moment hesabı ekledik.
+- Uygulamayı doğrudan açılabilir tek HTML dosyası ve yerel/GitHub Pages bağlantılarıyla erişilebilir yaptık.
+- Sonraki geliştirmeler için canlı çizim, ters kinematik, silindir seçimi ve emniyet alarmı fikirlerini belgeledik.
